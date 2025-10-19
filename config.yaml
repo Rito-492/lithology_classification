@@ -1,11 +1,11 @@
 num_classes: 3
-class_names: ['粉砂岩', '砂岩', '泥岩']
-batch_size: 64
+class_names: ['1', '2', '3']
+batch_size: 128
 num_workers: 4
-num_features: 3
-num_hidden: 2
+num_features: 4
+num_hidden: 3
 num_outputs: 1
-num_epochs: 100
-learning_rate: 1e-4
+epochs: 100
+learning_rate: 0.0001
 use_WELL: false
-use_DEPTH: false
+use_DEPTH: true

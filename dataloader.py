@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 import pandas as pd
 import torch
@@ -20,11 +19,14 @@ class LogDataset(Dataset):
         if use_well:
             feature_columns.append('WELL')
 
-        self.ids = self.df['ID'].values
+        self.ids = df['id'].values
         self.features = df[feature_columns].values
         
         self.labels = df['label'].values
         self.features = (self.features - self.features.mean(axis=0)) / (self.features.std(axis=0) + 1e-8)
+
+        print("Label distribution in dataset:")
+        print(df['label'].value_counts(normalize=True))
 
     def __len__(self):
         return len(self.features)
@@ -34,6 +36,9 @@ class LogDataset(Dataset):
         y = torch.tensor(self.labels[idx], dtype=torch.long)
         id_ = torch.tensor(self.ids[idx], dtype=torch.long)
         return x, y, id_
+    
+    def get_labels(self):
+        return self.labels
 
 
 def get_dataloader(csv_path, batch_size=64, shuffle=True, num_workers=4, use_depth=False, use_well=False):
@@ -45,4 +50,4 @@ def get_dataloader(csv_path, batch_size=64, shuffle=True, num_workers=4, use_dep
         num_workers=num_workers,
         drop_last=False
     )
-    return dataloader
+    return dataloader, dataset.get_labels()
