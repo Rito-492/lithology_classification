@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 
 import os
 import torch
@@ -91,7 +92,16 @@ for epoch in range(epochs):
 
     avg_loss = running_loss / len(train_loader)
 
-    val_acc = evaluate_model(model, val_loader, device)
+    print(f"\n 正在评估第 {epoch + 1} 轮...")
+    results = evaluate_model(
+        model=model,
+        val_loader=val_loader,
+        device=device,
+        save_dir=f"results/epoch_{epoch + 1}",  # 每轮保存一次结果
+        dataset=val_loader.dataset
+    )
+
+    val_acc = results['accuracy']
 
     print(f"Epoch [{epoch + 1}/{epochs}], Loss: {avg_loss:.4f}, Val Acc: {val_acc:.4f}")
 

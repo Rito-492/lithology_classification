@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 
 import pandas as pd
 import torch
@@ -19,9 +20,10 @@ class LogDataset(Dataset):
         if use_well:
             feature_columns.append('WELL')
 
+        self.ids = self.df['ID'].values
         self.features = df[feature_columns].values
+        
         self.labels = df['label'].values
-
         self.features = (self.features - self.features.mean(axis=0)) / (self.features.std(axis=0) + 1e-8)
 
     def __len__(self):
@@ -30,7 +32,8 @@ class LogDataset(Dataset):
     def __getitem__(self, idx):
         x = torch.tensor(self.features[idx], dtype=torch.float32)
         y = torch.tensor(self.labels[idx], dtype=torch.long)
-        return x, y
+        id_ = torch.tensor(self.ids[idx], dtype=torch.long)
+        return x, y, id_
 
 
 def get_dataloader(csv_path, batch_size=64, shuffle=True, num_workers=4, use_depth=False, use_well=False):
