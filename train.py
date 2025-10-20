@@ -72,7 +72,7 @@ def main():
 
 
     best_acc = 0.0
-    start_epoch = 100
+    start_epoch = 274
     print(f"\n\nStart training on {device}...")
 
     if os.path.exists(save_path):
