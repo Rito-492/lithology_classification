@@ -41,13 +41,14 @@ class LogDataset(Dataset):
         return self.labels
 
 
-def get_dataloader(csv_path, batch_size=64, shuffle=True, num_workers=4, use_depth=False, use_well=False):
+def get_dataloader(csv_path, batch_size=64, shuffle=True, num_workers=4, pin_memory=False, use_depth=False, use_well=False):
     dataset = LogDataset(csv_path, use_depth=use_depth, use_well=use_well)
     dataloader = DataLoader(
         dataset,
         batch_size=batch_size,
         shuffle=shuffle,
         num_workers=num_workers,
+        pin_memory=pin_memory,
         drop_last=False
     )
     return dataloader, dataset.get_labels()

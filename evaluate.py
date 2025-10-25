@@ -22,7 +22,7 @@ def evaluate_model(model, val_loader, device, save_dir=None, dataset=None):
     Returns:
         results (dict): 包含 accuracy, report, cm 等信息
     """
-    model.eval()
+    # model.eval()
     all_preds = []
     all_labels = []
     all_features = []
@@ -80,35 +80,38 @@ def evaluate_model(model, val_loader, device, save_dir=None, dataset=None):
     print("\n 混淆矩阵:")
     print(cm)
 
-    # 保存结果
-    if save_dir:
-        os.makedirs(save_dir, exist_ok=True)
-
-        # 1. 保存预测详情（可选：包含特征、真实标签、预测标签）
-        if hasattr(val_loader.dataset, 'df') and hasattr(val_loader.dataset, 'features'):
-            detail_df = pd.DataFrame({
-                'ID': val_loader.dataset.df['ID'].values,
-                'WELL': val_loader.dataset.df['WELL'].values,
-                'DEPTH': val_loader.dataset.df['DEPTH'].values,
-                'GR': val_loader.dataset.df['GR'].values,
-                'SP': val_loader.dataset.df['SP'].values,
-                'AC': val_loader.dataset.df['AC'].values,
-                'True_Label': all_labels,
-                'Pred_Label': all_preds
-            })
-            detail_df.to_csv(os.path.join(save_dir, 'prediction_details.csv'), index=False)
-            print(f"预测详情已保存至: {os.path.join(save_dir, 'prediction_details.csv')}")
+    # if dataset is not None and hasattr(dataset, 'df'):
+    #     try:
+    #         detail_data = {
+    #             'ID': dataset.df['id'].values if 'id' in dataset.df.columns else np.arange(len(all_labels)),
+    #             'WELL': dataset.df['WELL'].values if 'WELL' in dataset.df.columns else ['Unknown'] * len(all_labels),
+    #             'DEPTH': dataset.df['DEPTH'].values if 'DEPTH' in dataset.df.columns else np.zeros(len(all_labels)),
+    #             'GR': dataset.df['GR'].values if 'GR' in dataset.df.columns else np.zeros(len(all_labels)),
+    #             'SP': dataset.df['SP'].values if 'SP' in dataset.df.columns else np.zeros(len(all_labels)),
+    #             'AC': dataset.df['AC'].values if 'AC' in dataset.df.columns else np.zeros(len(all_labels)),
+    #             'label': all_labels,
+    #             'Pred_Label': all_preds
+    #         }
+    #         # 如果有ids信息，优先使用
+    #         if all_ids:
+    #             detail_data['id'] = all_ids
+                
+    #         detail_df = pd.DataFrame(detail_data)
+    #         detail_df.to_csv(os.path.join(save_dir, 'prediction_details.csv'), index=False)
+    #         print(f"预测详情已保存至: {os.path.join(save_dir, 'prediction_details.csv')}")
+    #     except Exception as e:
+    #         print(f"保存预测详情时出错: {e}")
 
         # 2. 保存分类报告
-        with open(os.path.join(save_dir, 'classification_report.txt'), 'w') as f:
-            f.write(f"Accuracy: {acc:.4f}\n\n")
-            f.write(report)
-        print(f"分类报告已保存至: {os.path.join(save_dir, 'classification_report.txt')}")
+        # with open(os.path.join(save_dir, 'classification_report.txt'), 'w') as f:
+        #     f.write(f"Accuracy: {acc:.4f}\n\n")
+        #     f.write(report)
+        # print(f"分类报告已保存至: {os.path.join(save_dir, 'classification_report.txt')}")
 
         # 3. 保存混淆矩阵
-        cm_df = pd.DataFrame(cm, index=['粉砂岩(真)', '砂岩(真)', '泥岩(真)'], columns=['粉砂岩(预)', '砂岩(预)', '泥岩(预)'])
-        cm_df.to_csv(os.path.join(save_dir, 'confusion_matrix.csv'))
-        print(f"混淆矩阵已保存至: {os.path.join(save_dir, 'confusion_matrix.csv')}")
+        # cm_df = pd.DataFrame(cm, index=['粉砂岩(真)', '砂岩(真)', '泥岩(真)'], columns=['粉砂岩(预)', '砂岩(预)', '泥岩(预)'])
+        # cm_df.to_csv(os.path.join(save_dir, 'confusion_matrix.csv'))
+        # print(f"混淆矩阵已保存至: {os.path.join(save_dir, 'confusion_matrix.csv')}")
 
     return results
 
@@ -121,29 +124,40 @@ if __name__ == '__main__':
     input_dim = config['num_features']
     num_classes = config['num_classes']
 
-    val_loader = get_dataloader(
+    val_loader, _ = get_dataloader(
         csv_path='data/val.csv',
         batch_size=config['batch_size'],
+        shuffle=False,
         num_workers=config['num_workers'],
         use_depth=config['use_DEPTH'],
         use_well=config['use_WELL']
     )
 
-    layers_hidden = [input_dim, 64, 32, num_classes]
+    layers_hidden = [input_dim, 128, 64, 32, num_classes]
 
     model = KAN(
         layers_hidden=layers_hidden,
         grid_size=5,
         spline_order=3,
-        scale_base=1.0,
+        scale_base=2.0,
         scale_spline=1.0,
         base_activation=torch.nn.SiLU,
-        grid_range=[-1, 1],
+        grid_range=[-2, 2],
         device=device
     ).to(device)
 
-    if os.path.exists('best_model.pth'):
-        model.load_state_dict(torch.load('best_model.pth', map_location=device))
+    if os.path.exists('best_model.pkl'):
+        model.load_state_dict(torch.load('best_model.pkl', map_location=device))
 
-    accuracy = evaluate_model(model, val_loader, device, save_dir='result/all', dataset=val_loader.dataset)['accuracy']
+    print(f"\nStart evaluating on {device}...")
+
+    print("\n>>> total params: {:.2f}M".format(sum(p.numel() for p in model.parameters()) / 1000000.0))
+
+    accuracy = evaluate_model(
+        model,
+        val_loader,
+        device,
+        save_dir='result/all',
+        dataset=val_loader.dataset
+    )['accuracy']
     print(f'Validation Accuracy: {accuracy * 100:.2f}%')
