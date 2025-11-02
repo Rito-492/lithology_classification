@@ -1,3 +1,4 @@
+
 import numpy as np
 import os
 import torch
@@ -18,8 +19,9 @@ def main():
 
     train_csv = "data/train.csv"
     val_csv = "data/val.csv"
-    save_path = "model.pkl"
-    best_save_path = "best_model_7503.pkl"
+    save_path = "models/model.pkl"
+    # best_save_path = "best_model_7503.pkl"
+    best_save_path = "models/best_model_res.pkl"
 
     num_classes = config['num_classes']
     batch_size = config['batch_size']
@@ -40,7 +42,7 @@ def main():
         batch_size=batch_size,
         shuffle=True,
         num_workers=num_workers,
-        pin_memory=True,
+        # pin_memory=True,
         use_depth=use_depth,
         use_well=use_well
     )
@@ -51,16 +53,10 @@ def main():
         batch_size=batch_size,
         shuffle=False,
         num_workers=num_workers,
-        pin_memory=True,
+        # pin_memory=True,
         use_depth=use_depth,
         use_well=use_well
     )
-
-
-    input_dim = len(train_loader.dataset.features[0])
-
-    # 定义网络结构：[input_dim, hidden1, hidden2, ..., num_classes]
-    # layers_hidden = [input_dim, 128, 64, 32, num_classes]
 
     model = KAN(
         layers_hidden=layers_hidden,
@@ -77,7 +73,6 @@ def main():
     class_weights = torch.tensor(class_weights, dtype=torch.float).to(device)
     criterion = nn.CrossEntropyLoss(weight=class_weights)
     optimizer = optim.AdamW(model.parameters(), lr=lr, weight_decay=1e-4)
-    scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='max', factor=0.5, patience=5)
 
 
     best_acc = 0.0
@@ -89,12 +84,12 @@ def main():
         print(f"Model loaded from {best_save_path}")
 
     for epoch in range(start_epoch, start_epoch + epochs):
-        # model.train()
+        model.train()
         running_loss = 0.0
         i = 0
 
         for i, (x, y, z) in enumerate(train_loader):
-            x, y = x.to(device, non_blocking=True), y.to(device, non_blocking=True)
+            x, y = x.to(device), y.to(device)
 
             optimizer.zero_grad()
             outputs = model(x)
@@ -119,19 +114,15 @@ def main():
 
         val_acc = results['accuracy']
 
-        print(f"\nEpoch [{epoch + 1}/{start_epoch + epochs}], Loss: {avg_loss:.4f}, Val Acc: {val_acc:.4f}")
+        print(f"Epoch [{epoch + 1}/{start_epoch + epochs}], Loss: {avg_loss:.4f}, Val Acc: {val_acc:.4f}")
         print("\n>>> total params: {:.2f}M".format(sum(p.numel() for p in model.parameters()) / 1000000.0))
 
         if val_acc > best_acc:
             best_acc = val_acc
-            torch.save(model.state_dict(), best_save_path)
+            torch.save(model.state_dict(), best_save_path + '1')
             print(f"Best model saved with accuracy: {best_acc:.4f}")
         
         torch.save(model.state_dict(), save_path)
-
-        # --- 调整学习率 ---
-        # scheduler.step(val_acc)
-        # print(f"\nCurrent learning rate: {optimizer.param_groups[0]['lr']:.6f}\n")
 
         # --- 定期更新 grid ---
         if (epoch + 1) % update_grid_interval == 0:

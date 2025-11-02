@@ -265,6 +265,7 @@ class KAN(torch.nn.Module):
         self.grid_size = grid_size
         self.spline_order = spline_order
         self.device = device
+        self.layer_hidden = layers_hidden
 
         self.layers = torch.nn.ModuleList()
         for in_features, out_features in zip(layers_hidden, layers_hidden[1:]):
@@ -284,7 +285,6 @@ class KAN(torch.nn.Module):
                 )
             )
 
-
     def to(self, device):
         self.device = device
         super().to(device)
@@ -293,11 +293,23 @@ class KAN(torch.nn.Module):
         return self
     
     def forward(self, x: torch.Tensor, update_grid=False):
+        curr = 4
+        resi = torch.tensor([0, 0, 0, 0]).to(self.device)
+        flag = False
         x = x.to(self.device)
-        for layer in self.layers:
+        for layer, hid in zip(self.layers, self.layer_hidden[1:]):
+            # x = layer(x)
             if update_grid:
                 layer.update_grid(x)
-            x = layer(x)
+            if curr == hid:
+                x = layer(x)
+                if flag:
+                    resi = x.to(self.device)
+                    flag=  False
+            else:
+                x = layer(x + resi)
+                curr = hid
+                flag = True
         return x
 
     def regularization_loss(self, regularize_activation=1.0, regularize_entropy=1.0):

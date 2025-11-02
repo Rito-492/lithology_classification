@@ -1,10 +1,7 @@
 
 __pycache__/
 
-results/
-
 data/train.csv
 data/val.csv
 
-model.pkl
-best_model.pkl
+report/

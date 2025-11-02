@@ -80,39 +80,6 @@ def evaluate_model(model, val_loader, device, save_dir=None, dataset=None):
     print("\n 混淆矩阵:")
     print(cm)
 
-    # if dataset is not None and hasattr(dataset, 'df'):
-    #     try:
-    #         detail_data = {
-    #             'ID': dataset.df['id'].values if 'id' in dataset.df.columns else np.arange(len(all_labels)),
-    #             'WELL': dataset.df['WELL'].values if 'WELL' in dataset.df.columns else ['Unknown'] * len(all_labels),
-    #             'DEPTH': dataset.df['DEPTH'].values if 'DEPTH' in dataset.df.columns else np.zeros(len(all_labels)),
-    #             'GR': dataset.df['GR'].values if 'GR' in dataset.df.columns else np.zeros(len(all_labels)),
-    #             'SP': dataset.df['SP'].values if 'SP' in dataset.df.columns else np.zeros(len(all_labels)),
-    #             'AC': dataset.df['AC'].values if 'AC' in dataset.df.columns else np.zeros(len(all_labels)),
-    #             'label': all_labels,
-    #             'Pred_Label': all_preds
-    #         }
-    #         # 如果有ids信息，优先使用
-    #         if all_ids:
-    #             detail_data['id'] = all_ids
-                
-    #         detail_df = pd.DataFrame(detail_data)
-    #         detail_df.to_csv(os.path.join(save_dir, 'prediction_details.csv'), index=False)
-    #         print(f"预测详情已保存至: {os.path.join(save_dir, 'prediction_details.csv')}")
-    #     except Exception as e:
-    #         print(f"保存预测详情时出错: {e}")
-
-        # 2. 保存分类报告
-        # with open(os.path.join(save_dir, 'classification_report.txt'), 'w') as f:
-        #     f.write(f"Accuracy: {acc:.4f}\n\n")
-        #     f.write(report)
-        # print(f"分类报告已保存至: {os.path.join(save_dir, 'classification_report.txt')}")
-
-        # 3. 保存混淆矩阵
-        # cm_df = pd.DataFrame(cm, index=['粉砂岩(真)', '砂岩(真)', '泥岩(真)'], columns=['粉砂岩(预)', '砂岩(预)', '泥岩(预)'])
-        # cm_df.to_csv(os.path.join(save_dir, 'confusion_matrix.csv'))
-        # print(f"混淆矩阵已保存至: {os.path.join(save_dir, 'confusion_matrix.csv')}")
-
     return results
 
 if __name__ == '__main__':
@@ -133,7 +100,7 @@ if __name__ == '__main__':
         use_well=config['use_WELL']
     )
 
-    layers_hidden = [input_dim, 128, 64, 32, num_classes]
+    layers_hidden = config['layers_hidden']
 
     model = KAN(
         layers_hidden=layers_hidden,
