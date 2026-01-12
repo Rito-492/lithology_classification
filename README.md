@@ -1,6 +1,6 @@
 ## 基于测井曲线的岩性识别与分类项目报告
 
-#### 项目成员：tyr、fyq、yhl、hfy
+#### 项目成员：tyr、fyq [@Damer-F](https://github.com/Damer-F) 、yhl、hfy [@Kimcra1](https://github.com/Kimcra1)
 
 ### 一、项目背景
 
@@ -37,7 +37,7 @@
 
 **（1）类别分布分析**
 
-![类别分布](../visualizations/01_class_distribution.png)
+![类别分布](./visualizations/01_class_distribution.png)
 
 包含饼图和柱状图，展示三种岩性的样本分布：
 - 类别 $0$（砂岩）：$9,989$ 个样本，占比 $26.13\%$
@@ -48,7 +48,7 @@
 
 **（2）特征分布直方图**
 
-![特征分布](../visualizations/02_feature_distributions.png)
+![特征分布](./visualizations/02_feature_distributions.png)
 
 展示四个特征的分布情况，并标注均值和中位数：
 - **SP**（自然电位）：均值 $54.98$，标准差 $21.59$，范围 $[7.47, 476.40]$
@@ -60,25 +60,25 @@
 
 **（3）特征相关性热力图**
 
-![特征相关性](../visualizations/03_correlation_matrix.png)
+![特征相关性](./visualizations/03_correlation_matrix.png)
 
 通过 $Pearson$ 相关系数矩阵，展示四个特征之间的线性相关关系，用于识别潜在的特征冗余和多重共线性问题。
 
 **（4）分类别箱线图**
 
-![分类别箱线图](../visualizations/04_boxplots_by_class.png)
+![分类别箱线图](./visualizations/04_boxplots_by_class.png)
 
 针对每个岩性类别，展示各特征的分布情况（中位数、四分位距、异常值等），帮助识别哪些特征对岩性分类具有最强的判别能力。
 
 **（5）特征散点矩阵**
 
-![特征散点矩阵](../visualizations/05_scatter_matrix.png)
+![特征散点矩阵](./visualizations/05_scatter_matrix.png)
 
 对 $SP$、$GR$、$AC$ 三个测井参数进行两两散点图绘制，对角线为各类别的直方图，非对角线为不同类别的散点分布。采样 $5000$ 个点以提高可视化效率，用于观察特征空间中的类别分布模式和聚类趋势。
 
 **（6）测井曲线综合显示**
 
-![测井曲线](../visualizations/06_well_logs.png)
+![测井曲线](./visualizations/06_well_logs.png)
 
 选取样本数最多的井，展示 $200$ 米连续井段的测井曲线和岩性柱：
 - 前三列：$SP$、$GR$、$AC$ 随深度变化的曲线
@@ -88,7 +88,7 @@
 
 **（7）分井统计分析**
 
-![分井统计](../visualizations/07_well_statistics.png)
+![分井统计](./visualizations/07_well_statistics.png)
 
 包含四个子图：
 - 各井样本数统计：井 $2$ 有 $16,776$ 个样本，井 $2010$ 仅有 $1,505$ 个样本
@@ -100,7 +100,7 @@
 
 **（8）特征随深度变化**
 
-![特征随深度变化](../visualizations/08_feature_by_depth.png)
+![特征随深度变化](./visualizations/08_feature_by_depth.png)
 
 三个散点图展示 $SP$、$GR$、$AC$ 随深度的变化趋势，不同颜色代表不同岩性。采样 $10,000$ 个点，用于观察测井参数的深度相关性和岩性的深度分布规律。
 
@@ -115,7 +115,7 @@
 1. **类别不平衡处理**：在训练过程中使用类别权重（$class\_weight$ 参数）
 2. **异常值处理**：对特征进行稳健归一化
 
-以上数据可视化与分析工作，由 ***黄方勇*** 完成。
+以上数据可视化与分析工作，由 ***hfy*** 完成。
 
 #### 2.模型架构
 
