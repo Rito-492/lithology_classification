@@ -1,6 +1,6 @@
 ## 基于测井曲线的岩性识别与分类项目报告
 
-#### 项目成员：tyr、fyq [@Damer-F](https://github.com/Damer-F) 、yhl、hfy [@Kimcra1](https://github.com/Kimcra1)
+#### 项目成员：tyr、fyq [@Damer-F](https://github.com/Damer-F) 、yhl[@yang233-jpg](https://github.com/yang233-jpg)、hfy [@Kimcra1](https://github.com/Kimcra1)
 
 ### 一、项目背景
 
